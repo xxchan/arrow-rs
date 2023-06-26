@@ -39,3 +39,6 @@ github:
         strict: true
         # don't require any jobs to pass
         contexts: []
+
+publish:
+  whoami: asf-site
