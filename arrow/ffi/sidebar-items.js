@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["bit_width","create_buffer"],"struct":["ArrowArray","ArrowArrayChild","FFI_ArrowArray","FFI_ArrowSchema","Flags"],"trait":["ArrowArrayRef"]};
