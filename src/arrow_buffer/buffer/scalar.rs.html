@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-buffer/src/buffer/scalar.rs`."><title>scalar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_buffer" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0-nightly (f20afcc45 2023-07-04)" data-channel="nightly" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../arrow_buffer/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-buffer/src/buffer/scalar.rs`."><title>scalar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_buffer" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -262,19 +262,21 @@
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
 <a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -313,8 +315,8 @@
 }
 
 <span class="kw">impl</span>&lt;T: ArrowNativeType&gt; std::fmt::Debug <span class="kw">for </span>ScalarBuffer&lt;T&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        f.debug_tuple(<span class="string">&quot;ScalarBuffer&quot;</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.as_ref()).finish()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_tuple(<span class="string">"ScalarBuffer"</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.as_ref()).finish()
     }
 }
 
@@ -331,8 +333,8 @@
     /// * `bytes` is not large enough for the requested slice
     </span><span class="kw">pub fn </span>new(buffer: Buffer, offset: usize, len: usize) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>size = std::mem::size_of::&lt;T&gt;();
-        <span class="kw">let </span>byte_offset = offset.checked_mul(size).expect(<span class="string">&quot;offset overflow&quot;</span>);
-        <span class="kw">let </span>byte_len = len.checked_mul(size).expect(<span class="string">&quot;length overflow&quot;</span>);
+        <span class="kw">let </span>byte_offset = offset.checked_mul(size).expect(<span class="string">"offset overflow"</span>);
+        <span class="kw">let </span>byte_len = len.checked_mul(size).expect(<span class="string">"length overflow"</span>);
         buffer.slice_with_length(byte_offset, byte_len).into()
     }
 
@@ -349,6 +351,14 @@
     <span class="doccomment">/// Returns the inner [`Buffer`], consuming self
     </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; Buffer {
         <span class="self">self</span>.buffer
+    }
+
+    <span class="doccomment">/// Returns true if this [`ScalarBuffer`] is equal to `other`, using pointer comparisons
+    /// to determine buffer equality. This is cheaper than `PartialEq::eq` but may
+    /// return false when the arrays are logically equal
+    </span><span class="attr">#[inline]
+    </span><span class="kw">pub fn </span>ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.buffer.ptr_eq(<span class="kw-2">&amp;</span>other.buffer)
     }
 }
 
@@ -388,10 +398,10 @@
         <span class="kw">match </span>buffer.deallocation() {
             Deallocation::Standard(<span class="kw">_</span>) =&gt; <span class="macro">assert!</span>(
                 is_aligned,
-                <span class="string">&quot;Memory pointer is not aligned with the specified scalar type&quot;
+                <span class="string">"Memory pointer is not aligned with the specified scalar type"
             </span>),
             Deallocation::Custom(<span class="kw">_</span>) =&gt;
-                <span class="macro">assert!</span>(is_aligned, <span class="string">&quot;Memory pointer from external source (e.g, FFI) is not aligned with the specified scalar type. Before importing buffer through FFI, please make sure the allocation is aligned.&quot;</span>),
+                <span class="macro">assert!</span>(is_aligned, <span class="string">"Memory pointer from external source (e.g, FFI) is not aligned with the specified scalar type. Before importing buffer through FFI, please make sure the allocation is aligned."</span>),
         }
 
         <span class="self">Self </span>{
@@ -416,9 +426,9 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: ArrowNativeType&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ScalarBuffer&lt;T&gt; {
-    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T;
-    <span class="kw">type </span>IntoIter = std::slice::Iter&lt;<span class="lifetime">&#39;a</span>, T&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T: ArrowNativeType&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span>ScalarBuffer&lt;T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">'a </span>T;
+    <span class="kw">type </span>IntoIter = std::slice::Iter&lt;<span class="lifetime">'a</span>, T&gt;;
 
     <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
         <span class="self">self</span>.as_ref().iter()
@@ -473,13 +483,11 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_debug() {
         <span class="kw">let </span>buffer = ScalarBuffer::from(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{buffer:?}&quot;</span>), <span class="string">&quot;ScalarBuffer([1, 2, 3])&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{buffer:?}"</span>), <span class="string">"ScalarBuffer([1, 2, 3])"</span>);
     }
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;Memory pointer is not aligned with the specified scalar type&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">"Memory pointer is not aligned with the specified scalar type"</span>)]
     </span><span class="kw">fn </span>test_unaligned() {
         <span class="kw">let </span>expected = [<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">2</span>];
         <span class="kw">let </span>buffer = Buffer::from_iter(expected.iter().cloned());
@@ -488,39 +496,35 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;the offset of the new Buffer cannot exceed the existing length&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">"the offset of the new Buffer cannot exceed the existing length"</span>)]
     </span><span class="kw">fn </span>test_length_out_of_bounds() {
         <span class="kw">let </span>buffer = Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">2</span>]);
         ScalarBuffer::&lt;i32&gt;::new(buffer, <span class="number">1</span>, <span class="number">3</span>);
     }
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;the offset of the new Buffer cannot exceed the existing length&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">"the offset of the new Buffer cannot exceed the existing length"</span>)]
     </span><span class="kw">fn </span>test_offset_out_of_bounds() {
         <span class="kw">let </span>buffer = Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">2</span>]);
         ScalarBuffer::&lt;i32&gt;::new(buffer, <span class="number">4</span>, <span class="number">0</span>);
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;offset overflow&quot;</span>)]
+    #[should_panic(expected = <span class="string">"offset overflow"</span>)]
     </span><span class="kw">fn </span>test_length_overflow() {
         <span class="kw">let </span>buffer = Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">2</span>]);
         ScalarBuffer::&lt;i32&gt;::new(buffer, usize::MAX, <span class="number">1</span>);
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;offset overflow&quot;</span>)]
+    #[should_panic(expected = <span class="string">"offset overflow"</span>)]
     </span><span class="kw">fn </span>test_start_overflow() {
         <span class="kw">let </span>buffer = Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">2</span>]);
         ScalarBuffer::&lt;i32&gt;::new(buffer, usize::MAX / <span class="number">4 </span>+ <span class="number">1</span>, <span class="number">0</span>);
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;length overflow&quot;</span>)]
+    #[should_panic(expected = <span class="string">"length overflow"</span>)]
     </span><span class="kw">fn </span>test_end_overflow() {
         <span class="kw">let </span>buffer = Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">2</span>]);
         ScalarBuffer::&lt;i32&gt;::new(buffer, <span class="number">0</span>, usize::MAX / <span class="number">4 </span>+ <span class="number">1</span>);

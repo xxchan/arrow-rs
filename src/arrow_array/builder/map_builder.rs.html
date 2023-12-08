@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-array/src/builder/map_builder.rs`."><title>map_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_array" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0-nightly (f20afcc45 2023-07-04)" data-channel="nightly" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../arrow_array/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-array/src/builder/map_builder.rs`."><title>map_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_array" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -249,30 +249,19 @@
 <a href="#249" id="249">249</a>
 <a href="#250" id="250">250</a>
 <a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -295,16 +284,16 @@
 /// let string_builder = StringBuilder::new();
 /// let int_builder = Int32Builder::with_capacity(4);
 ///
-/// // Construct `[{&quot;joe&quot;: 1}, {&quot;blogs&quot;: 2, &quot;foo&quot;: 4}, {}, null]`
+/// // Construct `[{"joe": 1}, {"blogs": 2, "foo": 4}, {}, null]`
 /// let mut builder = MapBuilder::new(None, string_builder, int_builder);
 ///
-/// builder.keys().append_value(&quot;joe&quot;);
+/// builder.keys().append_value("joe");
 /// builder.values().append_value(1);
 /// builder.append(true).unwrap();
 ///
-/// builder.keys().append_value(&quot;blogs&quot;);
+/// builder.keys().append_value("blogs");
 /// builder.values().append_value(2);
-/// builder.keys().append_value(&quot;foo&quot;);
+/// builder.keys().append_value("foo");
 /// builder.values().append_value(4);
 /// builder.append(true).unwrap();
 /// builder.append(true).unwrap();
@@ -313,7 +302,7 @@
 /// let array = builder.finish();
 /// assert_eq!(array.value_offsets(), &amp;[0, 1, 3, 3, 3]);
 /// assert_eq!(array.values().as_ref(), &amp;Int32Array::from(vec![1, 2, 4]));
-/// assert_eq!(array.keys().as_ref(), &amp;StringArray::from(vec![&quot;joe&quot;, &quot;blogs&quot;, &quot;foo&quot;]));
+/// assert_eq!(array.keys().as_ref(), &amp;StringArray::from(vec!["joe", "blogs", "foo"]));
 ///
 /// ```
 </span><span class="attr">#[derive(Debug)]
@@ -339,20 +328,16 @@
 <span class="kw">impl </span>Default <span class="kw">for </span>MapFieldNames {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            entry: <span class="string">&quot;entries&quot;</span>.to_string(),
-            key: <span class="string">&quot;keys&quot;</span>.to_string(),
-            value: <span class="string">&quot;values&quot;</span>.to_string(),
+            entry: <span class="string">"entries"</span>.to_string(),
+            key: <span class="string">"keys"</span>.to_string(),
+            value: <span class="string">"values"</span>.to_string(),
         }
     }
 }
 
 <span class="kw">impl</span>&lt;K: ArrayBuilder, V: ArrayBuilder&gt; MapBuilder&lt;K, V&gt; {
     <span class="doccomment">/// Creates a new `MapBuilder`
-    </span><span class="kw">pub fn </span>new(
-        field_names: <span class="prelude-ty">Option</span>&lt;MapFieldNames&gt;,
-        key_builder: K,
-        value_builder: V,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(field_names: <span class="prelude-ty">Option</span>&lt;MapFieldNames&gt;, key_builder: K, value_builder: V) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>capacity = key_builder.len();
         <span class="self">Self</span>::with_capacity(field_names, key_builder, value_builder, capacity)
     }
@@ -392,7 +377,7 @@
     </span><span class="kw">pub fn </span>append(<span class="kw-2">&amp;mut </span><span class="self">self</span>, is_valid: bool) -&gt; <span class="prelude-ty">Result</span>&lt;(), ArrowError&gt; {
         <span class="kw">if </span><span class="self">self</span>.key_builder.len() != <span class="self">self</span>.value_builder.len() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
-                <span class="string">&quot;Cannot append to a map builder when its keys and values have unequal lengths of {} and {}&quot;</span>,
+                <span class="string">"Cannot append to a map builder when its keys and values have unequal lengths of {} and {}"</span>,
                 <span class="self">self</span>.key_builder.len(),
                 <span class="self">self</span>.value_builder.len()
             )));
@@ -436,7 +421,7 @@
     ) -&gt; MapArray {
         <span class="macro">assert!</span>(
             keys_arr.null_count() == <span class="number">0</span>,
-            <span class="string">&quot;Keys array must have no null values, found {} null value(s)&quot;</span>,
+            <span class="string">"Keys array must have no null values, found {} null value(s)"</span>,
             keys_arr.null_count()
         );
 
@@ -476,10 +461,6 @@
         <span class="self">self</span>.null_buffer_builder.len()
     }
 
-    <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.len() == <span class="number">0
-    </span>}
-
     <span class="kw">fn </span>finish(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ArrayRef {
         Arc::new(<span class="self">self</span>.finish())
     }
@@ -509,12 +490,9 @@
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;Keys array must have no null values, found 1 null value(s)&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">"Keys array must have no null values, found 1 null value(s)"</span>)]
     </span><span class="kw">fn </span>test_map_builder_with_null_keys_panics() {
-        <span class="kw">let </span><span class="kw-2">mut </span>builder =
-            MapBuilder::new(<span class="prelude-val">None</span>, StringBuilder::new(), Int32Builder::new());
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = MapBuilder::new(<span class="prelude-val">None</span>, StringBuilder::new(), Int32Builder::new());
         builder.keys().append_null();
         builder.values().append_value(<span class="number">42</span>);
         builder.append(<span class="bool-val">true</span>).unwrap();

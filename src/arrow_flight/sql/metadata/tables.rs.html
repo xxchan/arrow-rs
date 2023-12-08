@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-flight/src/sql/metadata/tables.rs`."><title>tables.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="arrow_flight" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.0-nightly (f20afcc45 2023-07-04)" data-channel="nightly" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../../arrow_flight/index.html"><img class="rust-logo" src="../../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-flight/src/sql/metadata/tables.rs`."><title>tables.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="arrow_flight" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (503e12932 2023-12-07)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -479,14 +479,14 @@
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -499,11 +499,11 @@
 
 <span class="kw">use </span>arrow_arith::boolean::{and, or};
 <span class="kw">use </span>arrow_array::builder::{BinaryBuilder, StringBuilder};
-<span class="kw">use </span>arrow_array::{ArrayRef, RecordBatch};
-<span class="kw">use </span>arrow_ord::comparison::eq_utf8_scalar;
+<span class="kw">use </span>arrow_array::{ArrayRef, RecordBatch, StringArray};
+<span class="kw">use </span>arrow_ord::cmp::eq;
 <span class="kw">use </span>arrow_schema::{DataType, Field, Schema, SchemaRef};
 <span class="kw">use </span>arrow_select::{filter::filter_record_batch, take::take};
-<span class="kw">use </span>arrow_string::like::like_utf8_scalar;
+<span class="kw">use </span>arrow_string::like::like;
 <span class="kw">use </span>once_cell::sync::Lazy;
 
 <span class="kw">use </span><span class="kw">super</span>::lexsort_to_indices;
@@ -570,13 +570,13 @@
     /// - `db_schema_filter_pattern`: Specifies a filter pattern for schemas to search for.
     ///   When no pattern is provided, the pattern will not be used to narrow the search.
     ///   In the pattern string, two special characters can be used to denote matching rules:
-    ///     - &quot;%&quot; means to match any substring with 0 or more characters.
-    ///     - &quot;_&quot; means to match any one character.
+    ///     - "%" means to match any substring with 0 or more characters.
+    ///     - "_" means to match any one character.
     /// - `table_name_filter_pattern`: Specifies a filter pattern for tables to search for.
     ///   When no pattern is provided, all tables matching other filters are searched.
     ///   In the pattern string, two special characters can be used to denote matching rules:
-    ///     - &quot;%&quot; means to match any substring with 0 or more characters.
-    ///     - &quot;_&quot; means to match any one character.
+    ///     - "%" means to match any substring with 0 or more characters.
+    ///     - "_" means to match any one character.
     /// - `table_types`:  Specifies a filter of table types which must match.
     ///   An empy Vec matches all table types.
     /// - `include_schema`: Specifies if the Arrow schema should be returned for found tables.
@@ -660,12 +660,13 @@
         </span><span class="kw">let </span><span class="kw-2">mut </span>filters = <span class="macro">vec!</span>[];
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(catalog_filter_name) = catalog_filter {
-            filters.push(eq_utf8_scalar(<span class="kw-2">&amp;</span>catalog_name, <span class="kw-2">&amp;</span>catalog_filter_name)<span class="question-mark">?</span>);
+            <span class="kw">let </span>scalar = StringArray::new_scalar(catalog_filter_name);
+            filters.push(eq(<span class="kw-2">&amp;</span>catalog_name, <span class="kw-2">&amp;</span>scalar)<span class="question-mark">?</span>);
         }
 
         <span class="kw">let </span>tt_filter = table_types_filter
             .into_iter()
-            .map(|tt| eq_utf8_scalar(<span class="kw-2">&amp;</span>table_type, <span class="kw-2">&amp;</span>tt))
+            .map(|tt| eq(<span class="kw-2">&amp;</span>table_type, <span class="kw-2">&amp;</span>StringArray::new_scalar(tt)))
             .collect::&lt;std::result::Result&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?
             </span>.into_iter()
             <span class="comment">// We know the arrays are of same length as they are produced fromn the same root array
@@ -676,15 +677,14 @@
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(db_schema_filter_pattern) = db_schema_filter_pattern {
             <span class="comment">// use like kernel to get wildcard matching
-            </span>filters.push(like_utf8_scalar(
-                <span class="kw-2">&amp;</span>db_schema_name,
-                <span class="kw-2">&amp;</span>db_schema_filter_pattern,
-            )<span class="question-mark">?</span>)
+            </span><span class="kw">let </span>scalar = StringArray::new_scalar(db_schema_filter_pattern);
+            filters.push(like(<span class="kw-2">&amp;</span>db_schema_name, <span class="kw-2">&amp;</span>scalar)<span class="question-mark">?</span>)
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(table_name_filter_pattern) = table_name_filter_pattern {
             <span class="comment">// use like kernel to get wildcard matching
-            </span>filters.push(like_utf8_scalar(<span class="kw-2">&amp;</span>table_name, <span class="kw-2">&amp;</span>table_name_filter_pattern)<span class="question-mark">?</span>)
+            </span><span class="kw">let </span>scalar = StringArray::new_scalar(table_name_filter_pattern);
+            filters.push(like(<span class="kw-2">&amp;</span>table_name, <span class="kw-2">&amp;</span>scalar)<span class="question-mark">?</span>)
         }
 
         <span class="kw">let </span>batch = <span class="kw">if let </span><span class="prelude-val">Some</span>(table_schema) = table_schema {
@@ -750,7 +750,7 @@
         get_tables_schema(<span class="self">self</span>.include_schema())
     }
 
-    <span class="doccomment">/// Should the &quot;schema&quot; column be included
+    <span class="doccomment">/// Should the "schema" column be included
     </span><span class="kw">pub fn </span>include_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.table_schema.is_some()
     }
@@ -767,21 +767,21 @@
 <span class="doccomment">/// The schema for GetTables without `table_schema` column
 </span><span class="kw">static </span>GET_TABLES_SCHEMA_WITHOUT_TABLE_SCHEMA: Lazy&lt;SchemaRef&gt; = Lazy::new(|| {
     Arc::new(Schema::new(<span class="macro">vec!</span>[
-        Field::new(<span class="string">&quot;catalog_name&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-        Field::new(<span class="string">&quot;db_schema_name&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-        Field::new(<span class="string">&quot;table_name&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-        Field::new(<span class="string">&quot;table_type&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
+        Field::new(<span class="string">"catalog_name"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+        Field::new(<span class="string">"db_schema_name"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+        Field::new(<span class="string">"table_name"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+        Field::new(<span class="string">"table_type"</span>, DataType::Utf8, <span class="bool-val">false</span>),
     ]))
 });
 
 <span class="doccomment">/// The schema for GetTables with `table_schema` column
 </span><span class="kw">static </span>GET_TABLES_SCHEMA_WITH_TABLE_SCHEMA: Lazy&lt;SchemaRef&gt; = Lazy::new(|| {
     Arc::new(Schema::new(<span class="macro">vec!</span>[
-        Field::new(<span class="string">&quot;catalog_name&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-        Field::new(<span class="string">&quot;db_schema_name&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-        Field::new(<span class="string">&quot;table_name&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-        Field::new(<span class="string">&quot;table_type&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-        Field::new(<span class="string">&quot;table_schema&quot;</span>, DataType::Binary, <span class="bool-val">false</span>),
+        Field::new(<span class="string">"catalog_name"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+        Field::new(<span class="string">"db_schema_name"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+        Field::new(<span class="string">"table_name"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+        Field::new(<span class="string">"table_type"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+        Field::new(<span class="string">"table_schema"</span>, DataType::Binary, <span class="bool-val">false</span>),
     ]))
 });
 
@@ -795,25 +795,25 @@
             get_tables_schema(<span class="bool-val">false</span>),
             <span class="macro">vec!</span>[
                 Arc::new(StringArray::from(<span class="macro">vec!</span>[
-                    <span class="string">&quot;a_catalog&quot;</span>,
-                    <span class="string">&quot;a_catalog&quot;</span>,
-                    <span class="string">&quot;a_catalog&quot;</span>,
-                    <span class="string">&quot;a_catalog&quot;</span>,
-                    <span class="string">&quot;b_catalog&quot;</span>,
-                    <span class="string">&quot;b_catalog&quot;</span>,
-                    <span class="string">&quot;b_catalog&quot;</span>,
-                    <span class="string">&quot;b_catalog&quot;</span>,
+                    <span class="string">"a_catalog"</span>,
+                    <span class="string">"a_catalog"</span>,
+                    <span class="string">"a_catalog"</span>,
+                    <span class="string">"a_catalog"</span>,
+                    <span class="string">"b_catalog"</span>,
+                    <span class="string">"b_catalog"</span>,
+                    <span class="string">"b_catalog"</span>,
+                    <span class="string">"b_catalog"</span>,
                 ])) <span class="kw">as </span>ArrayRef,
                 Arc::new(StringArray::from(<span class="macro">vec!</span>[
-                    <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;a_schema&quot;</span>,
-                    <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;b_schema&quot;</span>,
+                    <span class="string">"a_schema"</span>, <span class="string">"a_schema"</span>, <span class="string">"b_schema"</span>, <span class="string">"b_schema"</span>, <span class="string">"a_schema"</span>, <span class="string">"a_schema"</span>,
+                    <span class="string">"b_schema"</span>, <span class="string">"b_schema"</span>,
                 ])) <span class="kw">as </span>ArrayRef,
                 Arc::new(StringArray::from(<span class="macro">vec!</span>[
-                    <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;a_table&quot;</span>,
-                    <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;b_table&quot;</span>,
+                    <span class="string">"a_table"</span>, <span class="string">"b_table"</span>, <span class="string">"a_table"</span>, <span class="string">"b_table"</span>, <span class="string">"a_table"</span>, <span class="string">"a_table"</span>, <span class="string">"b_table"</span>,
+                    <span class="string">"b_table"</span>,
                 ])) <span class="kw">as </span>ArrayRef,
                 Arc::new(StringArray::from(<span class="macro">vec!</span>[
-                    <span class="string">&quot;TABLE&quot;</span>, <span class="string">&quot;TABLE&quot;</span>, <span class="string">&quot;TABLE&quot;</span>, <span class="string">&quot;TABLE&quot;</span>, <span class="string">&quot;TABLE&quot;</span>, <span class="string">&quot;VIEW&quot;</span>, <span class="string">&quot;TABLE&quot;</span>, <span class="string">&quot;VIEW&quot;</span>,
+                    <span class="string">"TABLE"</span>, <span class="string">"TABLE"</span>, <span class="string">"TABLE"</span>, <span class="string">"TABLE"</span>, <span class="string">"TABLE"</span>, <span class="string">"VIEW"</span>, <span class="string">"TABLE"</span>, <span class="string">"VIEW"</span>,
                 ])) <span class="kw">as </span>ArrayRef,
             ],
         )
@@ -829,14 +829,14 @@
     ) -&gt; GetTablesBuilder {
         <span class="kw">let </span>dummy_schema = Schema::empty();
         <span class="kw">let </span>tables = [
-            (<span class="string">&quot;a_catalog&quot;</span>, <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;a_catalog&quot;</span>, <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;a_catalog&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;a_catalog&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;b_catalog&quot;</span>, <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;b_catalog&quot;</span>, <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;VIEW&quot;</span>),
-            (<span class="string">&quot;b_catalog&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;b_catalog&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;VIEW&quot;</span>),
+            (<span class="string">"a_catalog"</span>, <span class="string">"a_schema"</span>, <span class="string">"a_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"a_catalog"</span>, <span class="string">"a_schema"</span>, <span class="string">"b_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"a_catalog"</span>, <span class="string">"b_schema"</span>, <span class="string">"a_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"a_catalog"</span>, <span class="string">"b_schema"</span>, <span class="string">"b_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"b_catalog"</span>, <span class="string">"a_schema"</span>, <span class="string">"a_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"b_catalog"</span>, <span class="string">"a_schema"</span>, <span class="string">"a_table"</span>, <span class="string">"VIEW"</span>),
+            (<span class="string">"b_catalog"</span>, <span class="string">"b_schema"</span>, <span class="string">"b_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"b_catalog"</span>, <span class="string">"b_schema"</span>, <span class="string">"b_table"</span>, <span class="string">"VIEW"</span>),
         ];
         <span class="kw">let </span><span class="kw-2">mut </span>builder = GetTablesBuilder::new(
             catalog,
@@ -867,7 +867,7 @@
         <span class="kw">let </span>table_batch = builder.build().unwrap();
         <span class="macro">assert_eq!</span>(table_batch, ref_batch);
 
-        <span class="kw">let </span>builder = get_ref_builder(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;a%&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;a%&quot;</span>), Vec::new(), <span class="bool-val">false</span>);
+        <span class="kw">let </span>builder = get_ref_builder(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">"a%"</span>), <span class="prelude-val">Some</span>(<span class="string">"a%"</span>), Vec::new(), <span class="bool-val">false</span>);
         <span class="kw">let </span>table_batch = builder.build().unwrap();
         <span class="kw">let </span>indices = UInt32Array::from(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">4</span>, <span class="number">5</span>]);
         <span class="kw">let </span>ref_filtered = RecordBatch::try_new(
@@ -882,7 +882,7 @@
         .unwrap();
         <span class="macro">assert_eq!</span>(table_batch, ref_filtered);
 
-        <span class="kw">let </span>builder = get_ref_builder(<span class="prelude-val">Some</span>(<span class="string">&quot;a_catalog&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, Vec::new(), <span class="bool-val">false</span>);
+        <span class="kw">let </span>builder = get_ref_builder(<span class="prelude-val">Some</span>(<span class="string">"a_catalog"</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, Vec::new(), <span class="bool-val">false</span>);
         <span class="kw">let </span>table_batch = builder.build().unwrap();
         <span class="kw">let </span>indices = UInt32Array::from(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
         <span class="kw">let </span>ref_filtered = RecordBatch::try_new(
@@ -897,7 +897,7 @@
         .unwrap();
         <span class="macro">assert_eq!</span>(table_batch, ref_filtered);
 
-        <span class="kw">let </span>builder = get_ref_builder(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="macro">vec!</span>[<span class="string">&quot;VIEW&quot;</span>], <span class="bool-val">false</span>);
+        <span class="kw">let </span>builder = get_ref_builder(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="macro">vec!</span>[<span class="string">"VIEW"</span>], <span class="bool-val">false</span>);
         <span class="kw">let </span>table_batch = builder.build().unwrap();
         <span class="kw">let </span>indices = UInt32Array::from(<span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">7</span>]);
         <span class="kw">let </span>ref_filtered = RecordBatch::try_new(
@@ -919,14 +919,14 @@
         <span class="kw">let </span>dummy_schema = Schema::empty();
 
         <span class="kw">let </span>tables = [
-            (<span class="string">&quot;b_catalog&quot;</span>, <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;b_catalog&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;b_catalog&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;VIEW&quot;</span>),
-            (<span class="string">&quot;b_catalog&quot;</span>, <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;VIEW&quot;</span>),
-            (<span class="string">&quot;a_catalog&quot;</span>, <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;a_catalog&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;a_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;a_catalog&quot;</span>, <span class="string">&quot;b_schema&quot;</span>, <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
-            (<span class="string">&quot;a_catalog&quot;</span>, <span class="string">&quot;a_schema&quot;</span>, <span class="string">&quot;b_table&quot;</span>, <span class="string">&quot;TABLE&quot;</span>),
+            (<span class="string">"b_catalog"</span>, <span class="string">"a_schema"</span>, <span class="string">"a_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"b_catalog"</span>, <span class="string">"b_schema"</span>, <span class="string">"b_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"b_catalog"</span>, <span class="string">"b_schema"</span>, <span class="string">"b_table"</span>, <span class="string">"VIEW"</span>),
+            (<span class="string">"b_catalog"</span>, <span class="string">"a_schema"</span>, <span class="string">"a_table"</span>, <span class="string">"VIEW"</span>),
+            (<span class="string">"a_catalog"</span>, <span class="string">"a_schema"</span>, <span class="string">"a_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"a_catalog"</span>, <span class="string">"b_schema"</span>, <span class="string">"a_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"a_catalog"</span>, <span class="string">"b_schema"</span>, <span class="string">"b_table"</span>, <span class="string">"TABLE"</span>),
+            (<span class="string">"a_catalog"</span>, <span class="string">"a_schema"</span>, <span class="string">"b_table"</span>, <span class="string">"TABLE"</span>),
         ];
         <span class="kw">let </span><span class="kw-2">mut </span>builder = GetTablesBuilder::new(
             <span class="prelude-val">None</span>::&lt;String&gt;,
